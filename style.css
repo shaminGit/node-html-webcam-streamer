@@ -1,0 +1,12 @@
+.but {
+    padding: 1em;
+    margin: 1em;
+    background-color: antiquewhite;
+    color: black;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    margin: 1em;
+}

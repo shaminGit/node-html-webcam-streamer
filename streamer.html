@@ -1,0 +1,63 @@
+<html>
+
+<head>
+    <title>Streamer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class='row'>
+        <button type="submit" onclick="start()" class="button">Start Web Cam</button>
+        <button type="submit" onclick="stop()" class="but">Stop</button>
+    </div>
+    <video autoplay></video>
+    <script>
+        // get video dom element
+        const video = document.querySelector('video');
+
+        //  start and request access to webcam
+        const start = () => {
+            navigator.mediaDevices.getUserMedia({
+                video: {
+                    width: 626,
+                    height: 440
+                }
+            }).then((stream) => video.srcObject = stream);
+        }
+        // stop the webcam
+        const stop = (e) => {
+            var stream = video.srcObject;
+            var tracks = stream.getTracks();
+
+            for (var i = 0; i < tracks.length; i++) {
+                var track = tracks[i];
+                track.stop();
+            }
+            video.srcObject = null;
+        }
+        // returns a frame encoded in base64
+        const getFrame = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            const data = canvas.toDataURL('image/png');
+            return data;
+        }
+        const WS_URL = 'ws://localhost:3001';
+        const FPS = 30;
+        const ws = new WebSocket(WS_URL);
+        ws.onopen = () => {
+            console.log(`Connected to ${WS_URL}`);
+            setInterval(() => {
+                ws.send(getFrame());
+            }, 1001 / FPS);
+        }
+        ws.onclose = () => {
+            alert(" socket closed from server");
+        };
+        // stop the  webcam
+    </script>
+</body>
+
+</html>
